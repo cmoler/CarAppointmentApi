@@ -1,5 +1,6 @@
 package com.colton.carappointment.entities
 
+import com.fasterxml.jackson.annotation.JsonFormat
 import lombok.Data
 import java.time.LocalDateTime
 import javax.persistence.Entity

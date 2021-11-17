@@ -28,9 +28,11 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("com.h2database:h2")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-	implementation("org.jetbrains.kotlin:kotlin-reflect")
+	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("org.awaitility:awaitility:3.1.2")
+	implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.0")
 }
 
 tasks.withType<KotlinCompile> {

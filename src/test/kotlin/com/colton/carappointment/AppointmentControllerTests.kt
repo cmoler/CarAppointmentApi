@@ -3,8 +3,9 @@ package com.colton.carappointment
 
 import com.colton.carappointment.entities.Appointment
 import com.colton.carappointment.entities.AppointmentStatus
-import com.colton.carappointment.entities.DateRangeDto
-import com.google.gson.Gson
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.ObjectWriter
+import com.fasterxml.jackson.databind.SerializationFeature
 import lombok.SneakyThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -17,7 +18,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
+import java.nio.charset.Charset
 import java.time.LocalDateTime
+
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -28,6 +31,12 @@ class AppointmentControllerTests {
 
 	@Autowired
 	lateinit var webApplicationContext: WebApplicationContext
+
+	@Autowired
+	lateinit var objectMapper: ObjectMapper
+
+	val APPLICATION_JSON_UTF8: MediaType =
+		MediaType(MediaType.APPLICATION_JSON.type, MediaType.APPLICATION_JSON.subtype, Charset.forName("utf8"))
 
 	@BeforeEach
 	fun before() {
@@ -42,7 +51,7 @@ class AppointmentControllerTests {
 		mockMvc.perform(
 			MockMvcRequestBuilders.delete("/api/appointment/delete/1")
 				.contentType(MediaType.APPLICATION_JSON)
-		).andExpect(MockMvcResultMatchers.status().is5xxServerError)
+		).andExpect(MockMvcResultMatchers.status().is4xxClientError)
 	}
 
 	@SneakyThrows
@@ -56,20 +65,22 @@ class AppointmentControllerTests {
 	@SneakyThrows
 	@Test
 	fun shouldCallCreateOne() {
-		val range = Appointment(
+		val appointment = Appointment(
 			1,
 			LocalDateTime.parse("2018-11-28T18:35:24"),
 			LocalDateTime.parse("2018-11-28T18:35:24"),
 			120,
 			AppointmentStatus.ACTIVE
 		)
-		val gson = Gson()
-		val json = gson.toJson(range)
+
+		val mapper = ObjectMapper()
+		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false)
+		val requestJson: String = objectMapper.writeValueAsString(appointment)
 
 		mockMvc.perform(
 			MockMvcRequestBuilders.post("/api/appointment/")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(json)
+				.contentType(APPLICATION_JSON_UTF8)
+				.content(requestJson)
 		).andExpect(MockMvcResultMatchers.status().isOk)
 	}
 
@@ -94,14 +105,10 @@ class AppointmentControllerTests {
 	@SneakyThrows
 	@Test
 	fun shouldCallGetWithinRange() {
-		val range = DateRangeDto(LocalDateTime.now(), LocalDateTime.now())
-		val gson = Gson()
-		val json = gson.toJson(range)
-
 		mockMvc.perform(
-			MockMvcRequestBuilders.post("/api/appointment/withinRange")
+			MockMvcRequestBuilders.get(
+				"/api/appointment/withinRange/2018-11-28T18:35:24/2018-11-28T18:35:24")
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(json)
 		).andExpect(MockMvcResultMatchers.status().isOk)
 	}
 }

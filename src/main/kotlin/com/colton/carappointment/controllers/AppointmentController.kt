@@ -2,11 +2,11 @@ package com.colton.carappointment.controllers
 
 import com.colton.carappointment.entities.Appointment
 import com.colton.carappointment.entities.AppointmentStatus
-import com.colton.carappointment.entities.DateRangeDto
 import com.colton.carappointment.services.AppointmentService
 import lombok.RequiredArgsConstructor
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.time.LocalDateTime
 
 @RestController
 @RequiredArgsConstructor
@@ -19,7 +19,7 @@ class AppointmentController(val appointmentService: AppointmentService) {
             appointmentService.deleteAppointmentById(id)
             ResponseEntity.ok(null)
         } catch(ex: Exception) {
-            ResponseEntity.status(400).body(ex)
+            ResponseEntity.status(400).build()
         }
     }
 
@@ -46,10 +46,21 @@ class AppointmentController(val appointmentService: AppointmentService) {
         return ResponseEntity.ok(appointmentService.getAppointmentById(id))
     }
 
-    @PostMapping("/withinRange")
-    fun findWithinRange(@RequestBody range: DateRangeDto): ResponseEntity<List<Appointment>> {
-        return ResponseEntity.ok(
-            appointmentService.getAppointmentsWithInRangeSortedByPrice(range.startDate, range.endDate)
-        )
+    @GetMapping("/withinRange/{startDate}/{endDate}")
+    fun findWithinRange(@PathVariable startDate: String, @PathVariable endDate: String): ResponseEntity<List<Appointment>> {
+        return try{
+            val parsedStart = LocalDateTime.parse(startDate)
+            val parsedEnd = LocalDateTime.parse(endDate)
+
+            ResponseEntity.ok(
+                appointmentService.getAppointmentsWithInRangeSortedByPrice(
+                    parsedStart,
+                    parsedEnd
+                )
+            )
+        }
+        catch (exception: Exception) {
+            ResponseEntity.badRequest().build()
+        }
     }
 }

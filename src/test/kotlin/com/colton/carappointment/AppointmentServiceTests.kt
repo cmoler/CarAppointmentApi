@@ -125,8 +125,8 @@ class AppointmentServiceTests {
 
         val result = appointmentService.getAppointmentsWithInRangeSortedByPrice(start, end)
 
-        Assertions.assertEquals(3, result.size)
-        Assertions.assertEquals(14, result[0].price)
+        Assertions.assertEquals(3, result?.size)
+        Assertions.assertEquals(14, result!![0].price)
         Assertions.assertEquals(100, result[1].price)
         Assertions.assertEquals(120, result[2].price)
     }

@@ -37,12 +37,16 @@ class AppointmentService(val appointmentRepository: AppointmentRepository) {
         }
     }
 
-    fun getAppointmentsWithInRangeSortedByPrice(start: LocalDateTime, end: LocalDateTime): List<Appointment> {
-        return appointmentRepository
+    fun getAppointmentsWithInRangeSortedByPrice(start: LocalDateTime, end: LocalDateTime): List<Appointment>? {
+        return try {
+            appointmentRepository
             .findByStartDateAfterAndEndDateBefore(
                 start,
                 end,
                 Sort.by("price")
             )
+        } catch (exception: Exception) {
+            null
+        }
     }
 }
