@@ -21,8 +21,8 @@ class AppointmentService(val appointmentRepository: AppointmentRepository) {
         appointmentRepository.deleteById(id)
     }
 
-    fun createNewAppointment(appointment: Appointment) {
-        appointmentRepository.save(appointment);
+    fun createNewAppointment(appointment: Appointment): Appointment {
+        return appointmentRepository.save(appointment);
     }
 
     fun updateAppointmentStatus(id: Int, status: AppointmentStatus) {

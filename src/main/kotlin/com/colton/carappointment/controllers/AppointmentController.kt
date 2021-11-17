@@ -30,9 +30,8 @@ class AppointmentController(val appointmentService: AppointmentService) {
     }
 
     @PostMapping
-    fun createAppointment(@RequestBody appointment: Appointment): ResponseEntity<Void> {
-        appointmentService.createNewAppointment(appointment)
-        return ResponseEntity.ok(null)
+    fun createAppointment(@RequestBody appointment: Appointment): ResponseEntity<Appointment> {
+        return ResponseEntity.ok(appointmentService.createNewAppointment(appointment))
     }
 
     @PutMapping("/update/{id}/{status}")

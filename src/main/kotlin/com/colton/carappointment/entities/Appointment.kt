@@ -16,7 +16,7 @@ data class Appointment (
 
     val startDate: LocalDateTime,
     val endDate: LocalDateTime,
-    val price: Number,
+    val price: Double,
     var status: AppointmentStatus
 )
 

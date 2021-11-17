@@ -3,9 +3,12 @@ package com.colton.carappointment
 import com.colton.carappointment.entities.Appointment
 import com.colton.carappointment.entities.AppointmentStatus
 import com.colton.carappointment.services.AppointmentService
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.annotation.DirtiesContext
 import java.time.LocalDateTime
@@ -18,33 +21,45 @@ class AppointmentServiceTests {
     private lateinit var appointmentService: AppointmentService
 
     val appointment1Active = Appointment(
-        1,
+        null,
         LocalDateTime.parse("2018-11-28T18:35:24"),
         LocalDateTime.parse("2018-11-28T18:35:24"),
-        120,
+        120.0,
         AppointmentStatus.ACTIVE
     )
     val appointment2Active = Appointment(
-        2,
+        null,
         LocalDateTime.parse("2018-12-01T18:35:24"),
         LocalDateTime.parse("2018-12-01T18:35:24"),
-        14,
+        14.0,
         AppointmentStatus.ACTIVE
     )
     val appointment3Active = Appointment(
-        3,
+        null,
         LocalDateTime.parse("2018-12-03T18:35:24"),
         LocalDateTime.parse("2018-12-04T18:35:24"),
-        1,
+        1.0,
         AppointmentStatus.ACTIVE
     )
     val appointment4Cancelled = Appointment(
-        4,
+        null,
         LocalDateTime.parse("2018-11-30T18:35:24"),
         LocalDateTime.parse("2018-12-02T18:35:24"),
-        100,
+        100.0,
         AppointmentStatus.CANCELLED
     )
+
+    @BeforeEach
+    fun beforeEach() {
+        // clean up before each test
+        appointmentService.deleteAllAppointments()
+    }
+
+    @AfterEach
+    fun afterEach() {
+        // clean up after each test
+        appointmentService.deleteAllAppointments()
+    }
 
     @Test
     fun shouldSaveAppointment() {
@@ -58,27 +73,27 @@ class AppointmentServiceTests {
 
     @Test
     fun shouldDeleteAllAppointments() {
-        appointmentService.createNewAppointment(appointment1Active)
-        appointmentService.createNewAppointment(appointment2Active)
-        appointmentService.createNewAppointment(appointment3Active)
-        appointmentService.createNewAppointment(appointment4Cancelled)
+        val appointment1 = appointmentService.createNewAppointment(appointment1Active)
+        val appointment2 = appointmentService.createNewAppointment(appointment2Active)
+        val appointment3 = appointmentService.createNewAppointment(appointment3Active)
+        val appointment4 = appointmentService.createNewAppointment(appointment4Cancelled)
 
         appointmentService.deleteAllAppointments()
 
-        Assertions.assertNull(appointmentService.getAppointmentById(appointment1Active.id!!))
-        Assertions.assertNull(appointmentService.getAppointmentById(appointment2Active.id!!))
-        Assertions.assertNull(appointmentService.getAppointmentById(appointment3Active.id!!))
-        Assertions.assertNull(appointmentService.getAppointmentById(appointment4Cancelled.id!!))
+        Assertions.assertNull(appointmentService.getAppointmentById(appointment1.id!!))
+        Assertions.assertNull(appointmentService.getAppointmentById(appointment2.id!!))
+        Assertions.assertNull(appointmentService.getAppointmentById(appointment3.id!!))
+        Assertions.assertNull(appointmentService.getAppointmentById(appointment4.id!!))
     }
 
     @Test
     fun shouldDeleteAppointmentById() {
         appointmentService.createNewAppointment(appointment1Active)
         appointmentService.createNewAppointment(appointment2Active)
-        appointmentService.createNewAppointment(appointment3Active)
+        val appointment = appointmentService.createNewAppointment(appointment3Active)
         appointmentService.createNewAppointment(appointment4Cancelled)
 
-        appointmentService.deleteAppointmentById(appointment3Active.id!!)
+        appointmentService.deleteAppointmentById(appointment.id!!)
 
         Assertions.assertNotNull(appointmentService.getAppointmentById(appointment1Active.id!!))
         Assertions.assertNotNull(appointmentService.getAppointmentById(appointment2Active.id!!))
@@ -88,16 +103,16 @@ class AppointmentServiceTests {
 
     @Test
     fun shouldUpdateAppointmentStatus() {
-        appointmentService.createNewAppointment(appointment4Cancelled)
+        val appointment = appointmentService.createNewAppointment(appointment4Cancelled)
 
-        val appointment = appointmentService.getAppointmentById(appointment1Active.id!!)
+        appointmentService.getAppointmentById(appointment.id!!)
 
         Assertions.assertNotNull(appointment)
         Assertions.assertEquals(AppointmentStatus.CANCELLED, appointment?.status)
 
         appointmentService.updateAppointmentStatus(appointment?.id!!, AppointmentStatus.ACTIVE)
 
-        val updatedAppointment = appointmentService.getAppointmentById(appointment1Active.id!!)
+        val updatedAppointment = appointmentService.getAppointmentById(appointment.id!!)
 
         Assertions.assertNotNull(updatedAppointment)
         Assertions.assertEquals(AppointmentStatus.ACTIVE, updatedAppointment?.status)
@@ -105,9 +120,9 @@ class AppointmentServiceTests {
 
     @Test
     fun shouldGetAppointmentById() {
-        appointmentService.createNewAppointment(appointment1Active)
+        val appointment = appointmentService.createNewAppointment(appointment1Active)
 
-        val result = appointmentService.getAppointmentById(appointment1Active.id!!)
+        val result = appointmentService.getAppointmentById(appointment.id!!)
 
         Assertions.assertNotNull(result)
         Assertions.assertNotNull(result?.id)
@@ -126,8 +141,8 @@ class AppointmentServiceTests {
         val result = appointmentService.getAppointmentsWithInRangeSortedByPrice(start, end)
 
         Assertions.assertEquals(3, result?.size)
-        Assertions.assertEquals(14, result!![0].price)
-        Assertions.assertEquals(100, result[1].price)
-        Assertions.assertEquals(120, result[2].price)
+        Assertions.assertEquals(14.0, result!![0].price)
+        Assertions.assertEquals(100.0, result[1].price)
+        Assertions.assertEquals(120.0, result[2].price)
     }
 }

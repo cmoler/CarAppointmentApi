@@ -69,7 +69,7 @@ class AppointmentControllerTests {
 			1,
 			LocalDateTime.parse("2018-11-28T18:35:24"),
 			LocalDateTime.parse("2018-11-28T18:35:24"),
-			120,
+			120.0,
 			AppointmentStatus.ACTIVE
 		)
 
